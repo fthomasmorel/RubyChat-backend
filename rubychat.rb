@@ -1,11 +1,12 @@
 require 'sinatra/cross_origin'
 require 'sinatra'
-require 'JSON'
+require 'json'
 require 'mongo'
 
 class Message
   attr_reader :content, :username, :date
-  @@messages = []
+
+  @@db = Mongo::Client.new(['MONGO_SERVER:27017'], :database => 'rubychat')
 
   def initialize(username, content)
     @username = username
@@ -14,8 +15,7 @@ class Message
   end
 
   def save
-    db = Mongo::Client.new([ '127.0.0.1:27017' ], :database => 'rubychat')
-    db[:messages].insert_one(self.to_json)
+    @@db[:messages].insert_one(self.to_json)
   end
 
   def to_json
@@ -23,14 +23,13 @@ class Message
   end
 
   def self.all
-    db = Mongo::Client.new([ '127.0.0.1:27017' ], :database => 'rubychat')
-    p db[:messages].find
-    db[:messages].find.to_a.to_json
+    @@db[:messages].find.to_a.to_json
   end
 end
 
 set :port, 8080
 set :environment, :production
+set :protection, :except => [:json_csrf]
 register Sinatra::CrossOrigin
 
 configure do
