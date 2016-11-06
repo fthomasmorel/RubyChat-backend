@@ -6,6 +6,9 @@ require 'mongo'
 class Message
   attr_reader :content, :username, :date
 
+  ##########################
+  #       MODIFY HERE      #
+  ##########################
   @@db = Mongo::Client.new(['MONGO_SERVER:27017'], :database => 'rubychat')
 
   def initialize(username, content)
